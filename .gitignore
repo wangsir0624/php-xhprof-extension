@@ -67,3 +67,4 @@ php7/.libs
 src/Tideways/*.lo
 src/Tideways/.libs
 .vscode
+.idea

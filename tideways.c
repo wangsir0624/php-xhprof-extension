@@ -2804,6 +2804,7 @@ static void hp_clean_profiler_options_state(TSRMLS_D)
  */
 #define BEGIN_PROFILING(entries, symbol, profile_curr, execute_data)            \
     do {                                                                        \
+        printf("begin profiling symbol: %s\r\n", symbol);                       \
         /* Use a hash code to filter most of the string comparisons. */         \
         uint8 hash_code  = hp_inline_hash(symbol);                              \
         profile_curr = !hp_filter_entry(hash_code, symbol TSRMLS_CC);           \
@@ -3431,6 +3432,7 @@ void hp_mode_hier_beginfn_cb(hp_entry_t **entries, hp_entry_t *current, zend_exe
 
         /* Get CPU usage */
         if (TWG(tideways_flags) & TIDEWAYS_FLAGS_CPU) {
+            printf("call cpu timer");
             current->cpu_start = cpu_timer();
         }
 
@@ -3587,7 +3589,7 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
     }
 
     func = hp_get_function_name(real_execute_data TSRMLS_CC);
-
+    printf("func: %s\r\n", func);
     if (!func) {
 #if PHP_VERSION_ID < 50500
         _zend_execute(ops TSRMLS_CC);
@@ -3613,6 +3615,7 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
         return;
     }
 
+    printf("func begin profiling: %s\r\n", func);
     BEGIN_PROFILING(&TWG(entries), func, hp_profile_flag, real_execute_data);
 #if PHP_VERSION_ID < 50500
     _zend_execute(ops TSRMLS_CC);
@@ -3663,8 +3666,10 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data,
     }
 
     func = hp_get_function_name(execute_data TSRMLS_CC);
+    printf("internal func: %s\r\n", func);
 
     if (func) {
+        printf("internal func begin profiling: %s\r\n", func);
         BEGIN_PROFILING(&TWG(entries), func, hp_profile_flag, execute_data);
     }
 
