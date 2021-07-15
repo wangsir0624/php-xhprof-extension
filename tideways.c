@@ -3339,11 +3339,13 @@ static uint64 cycle_timer() {
  */
 static uint64 cpu_timer() {
 #if defined(CLOCK_PROCESS_CPUTIME_ID)
+    printf("clock_gettime called\r\n");
     struct timespec s;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &s);
 
     return s.tv_sec * 1000000 + s.tv_nsec / 1000;
 #else
+    printf("clock_gettime not called\r\n");
     struct rusage ru;
 
     getrusage(RUSAGE_SELF, &ru);
