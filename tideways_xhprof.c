@@ -145,7 +145,7 @@ PHP_MINFO_FUNCTION(tideways_xhprof)
         case 1:
             php_info_print_table_row(2, "Enable getrusage", "1");
         default:
-            php_info_print_table_row(2, "Enable getrusage", "0");
+            php_info_print_table_row(2, "Enable Getrusage", "0");
     }
     php_info_print_table_end();
 
