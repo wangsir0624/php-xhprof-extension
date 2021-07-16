@@ -141,6 +141,12 @@ PHP_MINFO_FUNCTION(tideways_xhprof)
             php_info_print_table_row(2, "Clock Source", "none");
             break;
     }
+    switch (INI_INT("tideways_xhprof.clock_use_getrusage")) {
+        case 1:
+            php_info_print_table_row(2, "Enable getrusage", "1");
+        default:
+            php_info_print_table_row(2, "Enable getrusage", "0");
+    }
     php_info_print_table_end();
 
     php_info_print_box_start(0);
