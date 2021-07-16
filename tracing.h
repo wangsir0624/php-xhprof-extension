@@ -117,6 +117,7 @@ zend_always_inline static int tracing_enter_frame_callgraph(zend_string *root_sy
     current_frame->recurse_level = 0;
     current_frame->wt_start = time_milliseconds(TXRG(clock_source), TXRG(timebase_factor));
 
+    printf("function enter frame callgraph: %s\r\n": ZSTR_VAL(function_name));
     if (TXRG(flags) & TIDEWAYS_XHPROF_FLAGS_CPU) {
         current_frame->cpu_start = cpu_timer();
     }

@@ -217,6 +217,7 @@ static zend_always_inline double get_timebase_factor(int source)
 static uint64 cpu_timer() {
     struct rusage ru;
 #if defined(CLOCK_PROCESS_CPUTIME_ID)
+    printf("clock_gettime called\r\n");
     struct timespec s;
 
     if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &s) == 0) {
