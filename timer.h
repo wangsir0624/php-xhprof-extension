@@ -36,6 +36,7 @@ static int determine_clock_source(int clock_use_rdtsc) {
     }
 
 #if HAVE_CLOCK_GETTIME
+    printf("determine clock source clock_gettime called\r\n");
     if (clock_gettime(CLOCK_MONOTONIC, &res) == 0) {
         return TIDEWAYS_XHPROF_CLOCK_CGT;
     }
@@ -64,6 +65,7 @@ static zend_always_inline uint64 time_milliseconds_cgt()
 {
 #if HAVE_CLOCK_GETTIME
     struct timespec s;
+    printf("time milliseconds cgt clock_gettime called\r\n");
 
     if (clock_gettime(CLOCK_MONOTONIC, &s) == 0) {
         return s.tv_sec * 1000000 + s.tv_nsec / 1000;
@@ -217,7 +219,7 @@ static zend_always_inline double get_timebase_factor(int source)
 static uint64 cpu_timer() {
     struct rusage ru;
 #if defined(CLOCK_PROCESS_CPUTIME_ID)
-    printf("clock_gettime called\r\n");
+    printf("cpu timer clock_gettime called\r\n");
     struct timespec s;
 
     if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &s) == 0) {
