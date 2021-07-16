@@ -479,6 +479,7 @@ PHP_INI_ENTRY("tideways.max_spans", "1500", PHP_INI_ALL, NULL)
 PHP_INI_ENTRY("tideways.stack_threshold", "20000", PHP_INI_ALL, NULL)
 PHP_INI_ENTRY("tideways.timeout", "10000", PHP_INI_ALL, NULL)
 PHP_INI_ENTRY("tideways.service", "", PHP_INI_ALL, NULL)
+PHP_INI_ENTRY("tideways.debug", 0, PHP_INI_ALL, NULL)
 
 PHP_INI_END()
 
@@ -2804,7 +2805,7 @@ static void hp_clean_profiler_options_state(TSRMLS_D)
  */
 #define BEGIN_PROFILING(entries, symbol, profile_curr, execute_data)            \
     do {                                                                        \
-        printf("begin profiling symbol: %s\r\n", symbol);                       \
+        if (INI_INT("tideways.debug") == 1) {printf("begin profiling symbol: %s\r\n", symbol);}                       \
         /* Use a hash code to filter most of the string comparisons. */         \
         uint8 hash_code  = hp_inline_hash(symbol);                              \
         profile_curr = !hp_filter_entry(hash_code, symbol TSRMLS_CC);           \
@@ -3328,6 +3329,9 @@ static uint64 cycle_timer() {
     return mach_absolute_time();
 #else
     struct timespec s;
+    if (INI_INT("tideways.debug") == 1) {
+        printf("cycle timer clock_gettime called\r\n");
+    }
     clock_gettime(CLOCK_MONOTONIC, &s);
 
     return s.tv_sec * 1000000 + s.tv_nsec / 1000;
@@ -3339,13 +3343,14 @@ static uint64 cycle_timer() {
  */
 static uint64 cpu_timer() {
 #if defined(CLOCK_PROCESS_CPUTIME_ID)
-    printf("clock_gettime called\r\n");
+    if (INI_INT("tideways.debug") == 1) {
+        printf("cpu timer clock_gettime called\r\n");
+    }
     struct timespec s;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &s);
 
     return s.tv_sec * 1000000 + s.tv_nsec / 1000;
 #else
-    printf("clock_gettime not called\r\n");
     struct rusage ru;
 
     getrusage(RUSAGE_SELF, &ru);
@@ -3434,7 +3439,9 @@ void hp_mode_hier_beginfn_cb(hp_entry_t **entries, hp_entry_t *current, zend_exe
 
         /* Get CPU usage */
         if (TWG(tideways_flags) & TIDEWAYS_FLAGS_CPU) {
-            printf("call cpu timer");
+            if (INI_INT("tideways.debug") == 1) {
+                printf("call cpu timer");
+            }
             current->cpu_start = cpu_timer();
         }
 
@@ -3591,7 +3598,9 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
     }
 
     func = hp_get_function_name(real_execute_data TSRMLS_CC);
-    printf("func: %s\r\n", func);
+    if (INI_INT("tideways.debug") == 1) {
+        printf("func: %s\r\n", func);
+    }
     if (!func) {
 #if PHP_VERSION_ID < 50500
         _zend_execute(ops TSRMLS_CC);
@@ -3617,7 +3626,9 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
         return;
     }
 
-    printf("func begin profiling: %s\r\n", func);
+    if (INI_INT("tideways.debug") == 1) {
+        printf("func begin profiling: %s\r\n", func);
+    }
     BEGIN_PROFILING(&TWG(entries), func, hp_profile_flag, real_execute_data);
 #if PHP_VERSION_ID < 50500
     _zend_execute(ops TSRMLS_CC);
@@ -3668,10 +3679,14 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data,
     }
 
     func = hp_get_function_name(execute_data TSRMLS_CC);
-    printf("internal func: %s\r\n", func);
+    if (INI_INT("tideways.debug") == 1) {
+        printf("internal func: %s\r\n", func);
+    }
 
     if (func) {
-        printf("internal func begin profiling: %s\r\n", func);
+        if (INI_INT("tideways.debug") == 1) {
+            printf("internal func begin profiling: %s\r\n", func);
+        }
         BEGIN_PROFILING(&TWG(entries), func, hp_profile_flag, execute_data);
     }
 
