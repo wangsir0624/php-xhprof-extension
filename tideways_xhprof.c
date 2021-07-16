@@ -18,6 +18,7 @@ ZEND_DLEXPORT void tideways_xhprof_execute_internal(zend_execute_data *execute_d
 ZEND_DLEXPORT void tideways_xhprof_execute_ex (zend_execute_data *execute_data);
 
 PHP_INI_BEGIN()
+    PHP_INI_ENTRY("tideways_xhprof.debug", 0, PHP_INI_ALL, NULL)
     STD_PHP_INI_ENTRY("tideways_xhprof.clock_use_rdtsc", "0", PHP_INI_SYSTEM, OnUpdateBool, clock_use_rdtsc, zend_tideways_xhprof_globals, tideways_xhprof_globals)
 PHP_INI_END()
 
