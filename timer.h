@@ -217,10 +217,12 @@ static zend_always_inline double get_timebase_factor(int source)
 static uint64 cpu_timer() {
     struct rusage ru;
 #if defined(CLOCK_PROCESS_CPUTIME_ID)
-    struct timespec s;
+    if (INI_INT("tideways_xhprof.clock_use_getrusage") == 0) {
+        struct timespec s;
 
-    if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &s) == 0) {
-        return s.tv_sec * 1000000 + s.tv_nsec / 1000;
+        if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &s) == 0) {
+            return s.tv_sec * 1000000 + s.tv_nsec / 1000;
+        }
     }
 #endif
 
